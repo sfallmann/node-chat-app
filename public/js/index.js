@@ -14,8 +14,9 @@ socket.on('disconnect', function() {
 });
 
 socket.on('newMessage', function(message) {
+  var time = moment(message.createdAt).format('h:mma')
   var newMsg = $('<li />', {
-    text: message.from + ': ' + message.text
+    text: message.from + ' ' + time + ': ' + message.text
   });
 
   $msgList.append(newMsg);
@@ -23,8 +24,9 @@ socket.on('newMessage', function(message) {
 });
 
 socket.on('newLocationMessage', function(message) {
+  var time = moment(message.createdAt).format('h:mma')
   var newMsg = $('<li />', {
-    text: message.from + ': '
+    text: message.from + ' ' + time + ': '
   });
 
   newMsg.append('<a href="' + message.url + '" target="_blank">My Location</a>');
