@@ -1,5 +1,10 @@
 var socket = io();
 
+var $text = $('[name=message]');
+var $locBtn = $('#send-location');
+var $msgList = $('#message-list');
+var $msgForm = $('#message-form');
+
 socket.on('connect', function() {
   console.log('Connected to server');
 });
@@ -13,7 +18,7 @@ socket.on('newMessage', function(message) {
     text: message.from + ': ' + message.text
   });
 
-  $('#message-list').append(newMsg);
+  $msgList.append(newMsg);
   console.log('newMessage:', message);
 });
 
@@ -21,33 +26,40 @@ socket.on('newLocationMessage', function(message) {
   var newMsg = $('<li />', {
     text: message.from + ': '
   });
-  newMsg.append('<a href="' + message.url + '" target="_blank">Location</a>');
-  $('#message-list').append(newMsg);
+
+  newMsg.append('<a href="' + message.url + '" target="_blank">My Location</a>');
+  $msgList.append(newMsg);
   console.log('newMessage:', message);
 });
 
-$('#message-form').on('submit', function(event) {
+$msgForm.on('submit', function(event) {
 
   event.preventDefault();
-  var text = $('[name=message]').val();
 
   socket.emit('createMessage', {
     from: 'User',
-    text: text
+    text: $text.val()
   }, function receipt(data){
-    console.log('Server receipt: ', data);
+    $text.val('');
   });
+
 });
 
-$('#send-location').on('click', function() {
+$locBtn.on('click', function() {
+
   if ('geolocation' in navigator) {
+
+    $locBtn.attr('disabled', 'disabled').text('Sending location...');
+
     navigator.geolocation.getCurrentPosition(function(position) {
       socket.emit('createLocationMessage', {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude
       });
+      $locBtn.removeAttr('disabled').text('Send location');
     }, function() {
       alert('Unable to fetch location');
+      $locBtn.removeAttr('disabled').text('Send location');
     });
   } else {
     alert('Geolocation is not supported in this browser');
