@@ -5,6 +5,20 @@ var $locBtn = $('#send-location');
 var $msgList = $('#message-list');
 var $msgForm = $('#message-form');
 
+
+function scrollToBtm() {
+  var clientHeight = $msgList.prop('clientHeight');
+  var scrollTop = $msgList.prop('scrollTop');
+  var scrollHeight = $msgList.prop('scrollHeight');
+  var $newMsg = $msgList.children('li:last-child');
+  var newMsgHeight = $newMsg.innerHeight();
+  var lastMsgHeight = $newMsg.prev().innerHeight();
+
+  if (clientHeight + scrollTop + newMsgHeight + lastMsgHeight >= scrollHeight){
+    $msgList.scrollTop(scrollHeight);
+  }
+};
+
 socket.on('connect', function() {
   console.log('Connected to server');
 });
@@ -23,6 +37,7 @@ socket.on('newMessage', function(message) {
   });
 
   $msgList.append(html);
+  scrollToBtm();
 });
 
 socket.on('newLocationMessage', function(message) {
@@ -35,7 +50,7 @@ socket.on('newLocationMessage', function(message) {
   });
 
   $msgList.append(html);
-
+  scrollToBtm();
 });
 
 $msgForm.on('submit', function(event) {
