@@ -2,7 +2,7 @@ const path = require('path');
 const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
-
+const {isRealString} = require('./utils/validation');
 
 const publicPath = path.join(__dirname, '../public');
 
@@ -22,6 +22,13 @@ io.on('connection', function connection(socket) {
 
   socket.broadcast.emit('newMessage',
   generateMessage('Admin', 'New user has joined'));
+
+  socket.on('join', (params, callback) => {
+    if (!isRealString(params.name) || !isRealString(params.room)) {
+      callback('Name and room name are required');
+    }
+    callback();
+  });
 
   socket.on('createMessage', function createEmail(message, callback) {
     console.log('Create message', message);
