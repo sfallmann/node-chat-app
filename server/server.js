@@ -41,7 +41,9 @@ io.on('connection', function connection(socket) {
 
   socket.on('createMessage', function createMessage(message, callback) {
     const user = users.getUser(socket.id);
-    io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
+    if (user && isRealString(message.text)){
+      io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
+    }
 
     if (typeof callback === 'function') {
       callback();
@@ -50,8 +52,11 @@ io.on('connection', function connection(socket) {
 
   socket.on('createLocationMessage', (coords) => {
     const user = users.getUser(socket.id);
-    io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name,
-    coords.latitude, coords.longitude));
+    if (user) {
+      io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name,
+      coords.latitude, coords.longitude));
+    }
+
   });
 
   socket.on('disconnect', function disconnect() {
@@ -64,7 +69,6 @@ io.on('connection', function connection(socket) {
 
     console.log('Disconnected from client');
   });
-  
 
 });
 
